@@ -82,18 +82,32 @@
               store.text[store.cursorPos.line].length
             );
           }
-
-          if (event.key === "ArrowLeft") {
+          else if (event.key === "ArrowLeft") {
             store.cursorPos.column = Math.max(store.cursorPos.column - 1, 0);
           }
-
-          if (event.key === "ArrowUp") {
+          else if (event.key === "ArrowUp") {
             store.cursorPos.line = Math.max(store.cursorPos.line - 1, 0);
           }
-
-          if (event.key === "ArrowDown") {
+          else if (event.key === "ArrowDown") {
             store.cursorPos.line = Math.min(store.cursorPos.line + 1, store.text.length - 1);
           }
+          else if (event.key === "Backspace") {
+            store.text[store.cursorPos.line] = store.text[store.cursorPos.line].substring(0, store.cursorPos.column - 1) + store.text[store.cursorPos.line].substring(store.cursorPos.column);
+            store.cursorPos.column -= 1;
+          }
+          else if (event.key === "Enter") {
+            const originalLine = store.text[store.cursorPos.line];
+            store.text[store.cursorPos.line] = store.text[store.cursorPos.line].substring(0, store.cursorPos.column);
+            store.text.splice(store.cursorPos.line + 1, 0, originalLine.substring(store.cursorPos.column));
+            store.cursorPos.line += 1;
+            store.cursorPos.column = 0;
+          }
+          else {
+            store.text[store.cursorPos.line] = store.text[store.cursorPos.line].substring(0, store.cursorPos.column) + event.key + store.text[store.cursorPos.line].substring(store.cursorPos.column);
+            store.cursorPos.column += 1;
+          }
+
+
           render();
         },
       };
