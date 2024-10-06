@@ -10,10 +10,13 @@
     <div id="ashjs"></div>
     <script type="text/javascript">
       function renderCharacter(char, isCursorOn) {
-        let classStyle = "inline-block h-8 w-4 bg-white text-black";
+        let classStyle = "inline-block h-6 w-3 align-top text-center";
 
         if (isCursorOn) {
-          classStyle = "inline-block h-8 w-4 bg-black text-white";
+          classStyle += " bg-black text-white";
+        }
+        else {
+          classStyle += " bg-white text-black";
         }
 
         return {
@@ -22,18 +25,27 @@
         };
       }
 
-      function renderCharacters(chars, cursorPos) {
-        const elems = chars
-          .split("")
-          .map((char, index) =>
-            renderCharacter(char, index === cursorPos.column)
-          );
+      function renderCharacters(lines, cursorPos) {
 
-        return elems;
+        const lineElems = lines.map((line, lineIndex) => {
+          const elems = line
+            .split("")
+            .map((char, charIndex) =>
+              renderCharacter(char, charIndex === cursorPos.column && lineIndex === cursorPos.line)
+            );
+          elems.push(renderCharacter(" ", cursorPos.column === line.length && lineIndex === cursorPos.line));
+
+          return {
+            div: elems,
+          };
+        })
+
+        return lineElems;
+
       }
 
       const store = {
-        text: "lorem ipsum dolor sit amet",
+        text: "lorem ipsum dolor sit amet\nconsectetur".split("\n"),
         cursorPos: {
           line: 0,
           column: 0,
@@ -55,6 +67,7 @@
             {
               div: renderCharacters(store.text, store.cursorPos),
               id: "editor-window",
+              class: "font-mono"
             },
           ];
         },
@@ -66,8 +79,20 @@
           if (event.key === "ArrowRight") {
             store.cursorPos.column = Math.min(
               store.cursorPos.column + 1,
-              store.text.length - 1
+              store.text[store.cursorPos.line].length
             );
+          }
+
+          if (event.key === "ArrowLeft") {
+            store.cursorPos.column = Math.max(store.cursorPos.column - 1, 0);
+          }
+
+          if (event.key === "ArrowUp") {
+            store.cursorPos.line = Math.max(store.cursorPos.line - 1, 0);
+          }
+
+          if (event.key === "ArrowDown") {
+            store.cursorPos.line = Math.min(store.cursorPos.line + 1, store.text.length - 1);
           }
           render();
         },
