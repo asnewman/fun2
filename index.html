@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>fun2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/asnewman/ashjs@v0.0.2/index.js"></script>
+  </head>
+  <body class="">
+    <div id="ashjs"></div>
+    <script type="text/javascript">
+      function renderCharacter(char, isCursorOn) {
+        let classStyle = "inline-block h-8 w-4 bg-white text-black";
+
+        if (isCursorOn) {
+          classStyle = "inline-block h-8 w-4 bg-black text-white";
+        }
+
+        return {
+          div: char,
+          class: classStyle,
+        };
+      }
+
+      function renderCharacters(chars, cursorPos) {
+        const elems = chars
+          .split("")
+          .map((char, index) =>
+            renderCharacter(char, index === cursorPos.column)
+          );
+
+        return elems;
+      }
+
+      const store = {
+        text: "lorem ipsum dolor sit amet",
+        cursorPos: {
+          line: 0,
+          column: 0,
+        },
+        eventListenerMounted: false,
+      };
+
+      const routes = {
+        "/": (emit) => {
+          if (!store.eventListenerMounted) {
+            addEventListener("keydown", (event) => {
+              emit("key-down", { event });
+            });
+
+            store.eventListenerMounted = true;
+          }
+
+          return [
+            {
+              div: renderCharacters(store.text, store.cursorPos),
+              id: "editor-window",
+            },
+          ];
+        },
+      };
+
+      const events = {
+        "key-down": (data, render) => {
+          const event = data.event;
+          if (event.key === "ArrowRight") {
+            store.cursorPos.column = Math.min(
+              store.cursorPos.column + 1,
+              store.text.length - 1
+            );
+          }
+          render();
+        },
+      };
+
+      new window.Ash(routes, events);
+    </script>
+  </body>
+</html>
