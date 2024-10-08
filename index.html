@@ -10,10 +10,12 @@
     <div id="ashjs"></div>
     <script type="text/javascript">
       function renderCharacter(char, isCursorOn) {
-        let classStyle = "inline-block h-8 w-4 bg-white text-black";
+        let classStyle = "inline-block h-6 w-3 align-top text-center";
 
         if (isCursorOn) {
-          classStyle = "inline-block h-8 w-4 bg-black text-white";
+          classStyle += " bg-black text-white";
+        } else {
+          classStyle += " bg-white text-black";
         }
 
         return {
@@ -22,18 +24,33 @@
         };
       }
 
-      function renderCharacters(chars, cursorPos) {
-        const elems = chars
-          .split("")
-          .map((char, index) =>
-            renderCharacter(char, index === cursorPos.column),
+      function renderCharacters(lines, cursorPos) {
+        const lineElems = lines.map((line, lineIndex) => {
+          const elems = line
+            .split("")
+            .map((char, charIndex) =>
+              renderCharacter(
+                char,
+                charIndex === cursorPos.column && lineIndex === cursorPos.line,
+              ),
+            );
+          elems.push(
+            renderCharacter(
+              " ",
+              cursorPos.column === line.length && lineIndex === cursorPos.line,
+            ),
           );
 
-        return elems;
+          return {
+            div: elems,
+          };
+        });
+
+        return lineElems;
       }
 
       const store = {
-        text: "lorem ipsum dolor sit amet",
+        text: "lorem ipsum dolor sit amet\nconsectetur".split("\n"),
         cursorPos: {
           line: 0,
           column: 0,
@@ -55,6 +72,7 @@
             {
               div: renderCharacters(store.text, store.cursorPos),
               id: "editor-window",
+              class: "font-mono",
             },
           ];
         },
@@ -66,9 +84,52 @@
           if (event.key === "ArrowRight") {
             store.cursorPos.column = Math.min(
               store.cursorPos.column + 1,
+              store.text[store.cursorPos.line].length,
+            );
+          } else if (event.key === "ArrowLeft") {
+            store.cursorPos.column = Math.max(store.cursorPos.column - 1, 0);
+          } else if (event.key === "ArrowUp") {
+            store.cursorPos.line = Math.max(store.cursorPos.line - 1, 0);
+          } else if (event.key === "ArrowDown") {
+            store.cursorPos.line = Math.min(
+              store.cursorPos.line + 1,
               store.text.length - 1,
             );
+          } else if (event.key === "Backspace") {
+            store.text[store.cursorPos.line] =
+              store.text[store.cursorPos.line].substring(
+                0,
+                store.cursorPos.column - 1,
+              ) +
+              store.text[store.cursorPos.line].substring(
+                store.cursorPos.column,
+              );
+            store.cursorPos.column -= 1;
+          } else if (event.key === "Enter") {
+            const originalLine = store.text[store.cursorPos.line];
+            store.text[store.cursorPos.line] = store.text[
+              store.cursorPos.line
+            ].substring(0, store.cursorPos.column);
+            store.text.splice(
+              store.cursorPos.line + 1,
+              0,
+              originalLine.substring(store.cursorPos.column),
+            );
+            store.cursorPos.line += 1;
+            store.cursorPos.column = 0;
+          } else {
+            store.text[store.cursorPos.line] =
+              store.text[store.cursorPos.line].substring(
+                0,
+                store.cursorPos.column,
+              ) +
+              event.key +
+              store.text[store.cursorPos.line].substring(
+                store.cursorPos.column,
+              );
+            store.cursorPos.column += 1;
           }
+
           render();
         },
       };

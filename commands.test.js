@@ -10,10 +10,10 @@ Deno.test("moveRight", () => {
   // End of the line has a +1 so you can continue
   // typing on the line
   const res2 = moveRight(line.length, line.length);
-  assertEquals(res2, { columnIdx: line.length + 1});
+  assertEquals(res2, { columnIdx: line.length + 1 });
 
   const res3 = moveRight(line.length + 1, line.length);
-  assertEquals(res3, { columnIdx: line.length + 1});
+  assertEquals(res3, { columnIdx: line.length + 1 });
 });
 
 Deno.test("moveLeft", () => {
@@ -22,4 +22,4 @@ Deno.test("moveLeft", () => {
 
   const res2 = moveLeft(4);
   assertEquals(res2, { columnIdx: 3 });
-})
+});
