@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -26,7 +26,7 @@
         const elems = chars
           .split("")
           .map((char, index) =>
-            renderCharacter(char, index === cursorPos.column)
+            renderCharacter(char, index === cursorPos.column),
           );
 
         return elems;
@@ -66,7 +66,7 @@
           if (event.key === "ArrowRight") {
             store.cursorPos.column = Math.min(
               store.cursorPos.column + 1,
-              store.text.length - 1
+              store.text.length - 1,
             );
           }
           render();
