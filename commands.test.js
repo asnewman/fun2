@@ -1,4 +1,4 @@
-import { moveLeft, moveRight } from "./commands.js";
+import { moveForwardByWord, moveLeft, moveRight } from "./commands.js";
 import { assertEquals } from "jsr:@std/assert";
 
 Deno.test("moveRight", () => {
@@ -23,3 +23,10 @@ Deno.test("moveLeft", () => {
   const res2 = moveLeft(4);
   assertEquals(res2, { columnIdx: 3 });
 });
+
+Deno.test("moveForwardByWord", () => {
+  const line = "hello world"
+
+  const res1 = moveForwardByWord([line], 0, 0)
+  assertEquals(res1, {columnIdx: 6, lineIdx: 0})
+})
